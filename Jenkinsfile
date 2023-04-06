@@ -62,7 +62,7 @@ pipeline {
         stage('Updating Kubernetes deployment file'){
             steps {
                 sh "cat deployment.yml"
-                sh "sed -i 's/${REPOSITORY_URI}.*/${REPOSITORY_URI}:${IMAGE_TAG}/g' deployment.yml"
+                sh "sed -i 's/${IMAGE_REPO_NAME}.*/${IMAGE_REPO_NAME}:${IMAGE_TAG}/g' deployment.yml"
                 sh "cat deployment.yml"
             }
         }
