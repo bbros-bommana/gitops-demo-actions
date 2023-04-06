@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKERHUB_USERNAME = "kunchalavikram"
+        DOCKERHUB_USERNAME = "krrish1110"
         APP_NAME = "gitops-demo-app"
         IMAGE_TAG = "${BUILD_NUMBER}"
         IMAGE_NAME = "${DOCKERHUB_USERNAME}" + "/" + "${APP_NAME}"
@@ -15,11 +15,10 @@ pipeline {
                 }
             }
         }
-        stage('Checkout SCM'){
+        stage('Checkout Application Source Code GitHub repo'){
             steps {
-                git credentialsId: 'github', 
-                url: 'https://github.com/kunchalavikram1427/gitops-demo.git',
-                branch: 'dev'
+                git url: 'https://github.com/krrish1110/gitops-demo.git',
+                branch: 'master'
             }
         }
         stage('Build Docker Image'){
@@ -34,7 +33,6 @@ pipeline {
                 script{
                     docker.withRegistry('', REGISTRY_CREDS ){
                         docker_image.push("${BUILD_NUMBER}")
-                        docker_image.push('latest')
                     }
                 }
             }
@@ -42,9 +40,16 @@ pipeline {
         stage('Delete Docker Images'){
             steps {
                 sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
-                sh "docker rmi ${IMAGE_NAME}:latest"
             }
         }
+
+        stage('Checkout eks manifest GitHub repo'){
+            steps {
+                git url: 'https://github.com/krrish1110/gitops-demo-config.git',
+                branch: 'master'
+            }
+        }
+
         stage('Updating Kubernetes deployment file'){
             steps {
                 sh "cat deployment.yml"
@@ -56,12 +61,12 @@ pipeline {
             steps {
                 script{
                     sh """
-                    git config --global user.name "vikram"
-                    git config --global user.email "vikram@gmail.com"
+                    git config --global user.name "krrish1110"
+                    git config --global user.email "krrish.kj1110@gmail.com"
                     git add deployment.yml
                     git commit -m 'Updated the deployment file' """
                     withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'pass', usernameVariable: 'user')]) {
-                        sh "git push http://$user:$pass@github.com/kunchalavikram1427/gitops-demo.git dev"
+                        sh "git push http://$user:$pass@github.com/krrish1110/gitops-demo-config.git master"
                     }
                 }
             }
