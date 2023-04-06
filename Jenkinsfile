@@ -60,13 +60,13 @@ pipeline {
         stage('Push the changed deployment file to Git'){
             steps {
                 script{
+                    sh """
+                    git config --global user.name "krrish1110"
+                    git config --global user.email "krrish.kj1110@gmail.com"
+                    git add deployment.yml
+                    git commit -m 'Updated the deployment file' """
                     withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'pass', usernameVariable: 'user')]) {
-                        sh "git config user.email krrish.kj1110@gmail.com"
-                        sh "git config user.name krrish1110"
-                        //sh "git switch master"
-                        sh "git add deployment.yml"
-                        sh "git commit -m 'Updated the deployment file'"
-                        sh "git push git push https://$user:$pass@github.com/krrish1110/gitops-demo-config.git HEAD:master"
+                        sh('git push https://$user:$pass@github.com/krrish1110/gitops-demo-config.git master')
                     }
                 }
             }
