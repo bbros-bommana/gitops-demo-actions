@@ -9,6 +9,14 @@ pipeline {
     }
 
     stages { 
+        stage('Cleanup Workspace'){
+            steps {
+                script {
+                    cleanWs()
+                }
+            }
+        }
+        
         stage('Logging into AWS ECR') {
             steps {
                 script {
