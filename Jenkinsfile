@@ -1,62 +1,64 @@
 pipeline {
     agent any
     environment {
-        DOCKERHUB_USERNAME = "krrish1110"
-        APP_NAME = "gitops-demo-app"
-        IMAGE_TAG = "${BUILD_NUMBER}"
-        IMAGE_NAME = "${DOCKERHUB_USERNAME}" + "/" + "${APP_NAME}"
-        REGISTRY_CREDS = 'dockerhub'
-        }
-    stages {
-        stage('Cleanup Workspace'){
+        AWS_ACCOUNT_ID="356791834110"
+        AWS_DEFAULT_REGION="us-east-2"
+        IMAGE_REPO_NAME="gitops-skm-demo"
+        IMAGE_TAG="${BUILD_NUMBER}"
+        REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
+    }
+
+    stages { 
+        stage('Logging into AWS ECR') {
             steps {
                 script {
-                    cleanWs()
+
+                    sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
                 }
+                 
             }
         }
-        stage('Checkout Application Source Code GitHub repo'){
+        
+        stage('Cloning Git') {
             steps {
-                git url: 'https://github.com/krrish1110/gitops-demo.git',
-                branch: 'master'
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/krrish1110/gitops-demo.git']]])     
             }
         }
-        stage('Build Docker Image'){
-            steps {
-                script{
-                    docker_image = docker.build "${IMAGE_NAME}"
+  
+
+        stage('Building image') {
+            steps{ 
+                script {                    
+                    dockerImage = docker.build "${IMAGE_REPO_NAME}:${IMAGE_TAG}"
                 }
-            }
-        }
-        stage('Push Docker Image'){
-            steps {
-                script{
-                    docker.withRegistry('', REGISTRY_CREDS ){
-                        docker_image.push("${BUILD_NUMBER}")
-                    }
-                }
-            }
-        } 
-        stage('Delete Docker Images'){
-            steps {
-                sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
 
-        stage('Checkout eks manifest GitHub repo'){
-            steps {
+        stage('Push docker image to ECR registry') {
+            steps{
+                script{
+                    sh "docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}:$IMAGE_TAG"
+                    sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+                }
+            }
+        }
+
+        stage('Checkout eks manifest GitHub repo') {
+            steps{
                 git url: 'https://github.com/krrish1110/gitops-demo-config.git',
                 branch: 'master'
             }
+
         }
 
         stage('Updating Kubernetes deployment file'){
             steps {
                 sh "cat deployment.yml"
-                sh "sed -i 's/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g' deployment.yml"
+                sh "sed -i 's/${REPOSITORY_URI}.*/${REPOSITORY_URI}:${IMAGE_TAG}/g' deployment.yml"
                 sh "cat deployment.yml"
             }
         }
+
         stage('Push the changed deployment file to Git'){
             steps {
                 script{
@@ -71,22 +73,8 @@ pipeline {
                 }
             }
         }
+
+
     }
+
 }
-
-
-// stage('Build Docker Image'){
-//             steps {
-//                 sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-//                 sh "docker build -t ${IMAGE_NAME}:latest ."
-//             }
-//         }
-//         stage('Push Docker Image'){
-//             steps {
-//                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'pass', usernameVariable: 'user')]) {
-//                     sh "docker login -u $user --password $pass"
-//                     sh "docker push ${IMAGE_NAME}:${IMAGE_TAG} ."
-//                     sh "docker push ${IMAGE_NAME}:latest ."
-//                 }
-//             }
-//         }
