@@ -82,19 +82,6 @@ pipeline {
             }
         }
 
-        stage('ECR Image Pull Secrets') {
-            steps {
-                script{
-                    sh """ 
-                    NAMESPACE_NAME="gitops" && \
-                    kubectl create namespace $NAMESPACE_NAME || true && \
-                    kubectl create secret docker-registry regcred \
-                    kubectl create secret docker-registry regcred --docker-server=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com --docker-username=AWS --docker-password=$(aws ecr get-login-password) --namespace=$NAMESPACE_NAME """
-                    
-                }
-            }
-        }
-
 
     }
 
