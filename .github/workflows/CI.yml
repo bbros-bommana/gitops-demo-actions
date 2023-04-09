@@ -75,6 +75,6 @@ jobs:
         ORG: bbros-bommana
         REPO: gitops-demo-config-actions
       run: |  
-         curl -d "{\"event_type\": \"${EVENT}\" , "client_payload":{ "image":"gitops-skm-demo:${{ github.sha }}" }}" -H "Content-Type: application/json" -H "Authorization: token ${GITHUB_TOKEN}" -H "Accept: application/vnd.github.everest-preview+json" "https://api.github.com/repos/${ORG}/${REPO}/dispatches"
+         curl -d "{\"event_type\": \"${EVENT}\" , "client_payload":{ "image":"gitops-skm-demo:${{ github.sha }}" }}" -H "Content-Type: application/json" -H "Authorization: token ${GITHUB_TOKEN}" -H "Accept: application/vnd.github.everest-preview+json" "https://api.github.com/repos/bbros-bommana/gitops-demo-config-actions/dispatches"
 #        curl -d "{\"event_type\": \"${EVENT}\" , "client_payload":{ "image":"gitops-skm-demo:${{ github.sha }}" }" -H "Content-Type: application/json" -H "Authorization: token ${GITHUB_TOKEN}" -H "Accept: application/vnd.github.everest-preview+json" "https://api.github.com/repos/${ORG}/${REPO}/dispatches"
 
