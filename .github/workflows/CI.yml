@@ -72,6 +72,6 @@ jobs:
       uses: peter-evans/repository-dispatch@v1
       with:
         token: ${{ secrets.SKM_GITHUB_ACTIONS }}
-        repository: ${{ github.actor }}/gitops-demo-config-actions
+        repository: bbros-bommana/gitops-demo-config-actions
         event-type: new-image
         client-payload: '{"image": "${{ env.ECR_Registry }}/${{ env.ECR_IMAGE_NAME }}:${{ github.sha }}"}'
