@@ -71,7 +71,7 @@ jobs:
     - name: Repository Dispatch
       uses: peter-evans/repository-dispatch@v1
       with:
-        token: ${{ github.token }}
+        token: ${{ secrets.PAT }}
         repository: ${{ github.actor }}/gitops-demo-config-actions
         event-type: new-image
         client-payload: '{"image": "${{ env.ECR_Registry }}/${{ env.ECR_IMAGE_NAME }}:${{ github.sha }}"}'
