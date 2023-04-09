@@ -70,7 +70,7 @@ jobs:
 
     - name: call the other repo
       env:
-        GITHUB_TOKEN: ${{ secrets.skm_github_actions }}
+        GITHUB_TOKEN: ${{ secrets.SAI_GITHUB_ACTIONS }}
         EVENT: new-image
         ORG: bbros-bommana
         REPO: gitops-demo-config-actions
