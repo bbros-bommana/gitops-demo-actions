@@ -55,7 +55,7 @@ jobs:
           git config --global user.name "krrish1110"
           git config --global user.email "krrish.kj1110@gmail.com"
           echo ${{ github.sha }}
-          sed -i "s/${{ env.ECR_Registry }}.*/${{ env.ECR_Registry }}/gitops-skm-demo:${{ github.sha }}/g" deployment.yml
+          sed -i "s#${{ env.ECR_Registry }}.*#${{ env.ECR_Registry }}/gitops-skm-demo:${{ github.sha }}#g" deployment.yaml
           git add -A
           git commit -am "Update image for - ${{ github.sha }}"
       - run: echo ${{ github }}
