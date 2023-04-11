@@ -49,7 +49,7 @@ jobs:
         with:
           repository: bbros-bommana/first-org-priv-repo
           ref: 'main'
-          token: ${{ secrets.PRIV_GITHUB_ACTIONS }}
+          token: ${{ secrets.PRIV_GITHUB_ACTIONSS }}
       - name: setup git config
         run: |
           git config --global user.name "krrish1110"
