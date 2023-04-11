@@ -47,16 +47,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          repository: bbros-bommana/gitops-demo-config-actions
+          repository: bbros-bommana/first-org-priv-repo
           ref: 'master'
-          token: ${{ secrets.SAI_GITHUB_ACTIONS }}
+          token: ${{ secrets.PRIV_GITHUB_ACTIONS }}
       - name: setup git config
         run: |
           git config --global user.name "krrish1110"
           git config --global user.email "krrish.kj1110@gmail.com"
           echo ${{ github.sha }}
-          sed -i "s#${{ env.ECR_Registry }}.*#${{ env.ECR_Registry }}/gitops-skm-demo:${{ github.sha }}#g" deployment.yml
-          git add -A
-          git commit -am "Update image for - ${{ github.sha }}"
-      - run: echo ${{ github }}
-      - run: git push origin master
+      - run: cat package.json
